@@ -13,17 +13,13 @@ function makeShape(x, y) {
 
 let squares = [];
 
-function draw() {
-    screen.clearRect(0,0,800,600);
+function logic() {
     squares.forEach((s)=>{
-        screen.fillStyle = s.fillStyle;
-        s.y += s.ySpeed;
-        s.x += s.xSpeed;
-        s.ySpeed += 1;
-        screen.beginPath();
-        screen.arc(s.x,s.y,s.size,0,2*Math.PI);
-        screen.fill();
+        s.y += s.ySpeed; //Move in y-direction
+        s.x += s.xSpeed; //Move in x-direction
+        s.ySpeed += 1; //Accelerate downwards
 
+        //Bounce at bottom
         if(s.y > 600-s.size){
             s.ySpeed = -parseInt(s.ySpeed - 1) / 2;
             s.xSpeed = parseInt(s.xSpeed/2);
@@ -31,13 +27,32 @@ function draw() {
         }
     });
 
-    requestAnimationFrame(draw)
 }
 
-canvas.onmousemove = (evt) => {
+function draw() {
+    screen.clearRect(0,0,800,600); //Clear canvas
+
+    squares.forEach((s)=>{
+        screen.fillStyle = s.fillStyle; //Set fill color
+        screen.strokeStyle = s.fillStyle; //Set outline color
+        screen.beginPath(); //Start defining a shape
+        screen.arc(s.x,s.y,s.size,0,2*Math.PI); //Define a circle
+        screen.stroke(); //Draw the circle
+    });
+
+}
+
+function gameLoop() {
+    requestAnimationFrame(gameLoop); //Call this method again before next screen update    
+    logic();
+    draw();    
+}
+
+//When mouse moves across the canvas, add a new shape
+canvas.onmousemove = (mouseEvent) => {
     squares.push(
-        makeShape(evt.offsetX, evt.offsetY)
+        makeShape(mouseEvent.offsetX, mouseEvent.offsetY)
     )
 };
-draw();
+gameLoop();
 
